@@ -166,6 +166,83 @@ async function insertionSort() {
   pauseResumeVisualizationBtn.disabled = true;
 }
 
+async function merge(bars, start, mid, end) {
+  let n1 = mid - start + 1;
+  let n2 = end - mid;
+  let leftArray = [];
+  let rightArray = [];
+
+  for (let i = 0; i < n1; i++) {
+    leftArray[i] = array[start + i];
+  }
+  for (let i = 0; i < n2; i++) {
+    rightArray[i] = array[mid + 1 + i];
+  }
+
+  let i = 0,
+    j = 0,
+    k = start;
+  while (i < n1 && j < n2) {
+    bars[start + i].style.backgroundColor = "var(--bar-comparing)";
+    bars[mid + 1 + j].style.backgroundColor = "var(--bar-comparing)";
+    await sleep(visualizationSpeed);
+
+    if (leftArray[i] <= rightArray[j]) {
+      array[k] = leftArray[i];
+      bars[k].style.height = `${(array[k] / maxArrayValue) * 100}%`;
+      bars[k].innerText = array[k];
+      i++;
+    } else {
+      array[k] = rightArray[j];
+      bars[k].style.height = `${(array[k] / maxArrayValue) * 100}%`;
+      bars[k].innerText = array[k];
+      j++;
+    }
+    k++;
+  }
+
+  while (i < n1) {
+    array[k] = leftArray[i];
+    bars[k].style.height = `${(array[k] / maxArrayValue) * 100}%`;
+    bars[k].innerText = array[k];
+    i++;
+    k++;
+  }
+
+  while (j < n2) {
+    array[k] = rightArray[j];
+    bars[k].style.height = `${(array[k] / maxArrayValue) * 100}%`;
+    bars[k].innerText = array[k];
+    j++;
+    k++;
+  }
+
+  for (let i = start; i <= end; i++) {
+    bars[i].style.backgroundColor = "var(--sorted-bar-color)";
+    await sleep(visualizationSpeed);
+  }
+}
+
+async function mergeSortHelper(bars, start, end) {
+  if (start < end) {
+    let mid = Math.floor((start + end) / 2);
+    await mergeSortHelper(bars, start, mid);
+    await mergeSortHelper(bars, mid + 1, end);
+    await merge(bars, start, mid, end);
+  }
+}
+
+async function mergeSort() {
+  pauseResumeVisualizationBtn.disabled = false;
+  generateArrayBtn.disabled = true;
+  startVisualizationBtn.disabled = true;
+  const bars = arrayContainer.children;
+  await mergeSortHelper(bars, 0, array.length - 1);
+  generateArrayBtn.disabled = false;
+  startVisualizationBtn.disabled = false;
+  pauseResumeVisualizationBtn.disabled = true;
+}
+
 arraySizeSlider.addEventListener("input", (e) => {
   arraySize = e.target.value;
 });
@@ -199,6 +276,9 @@ startVisualizationBtn.addEventListener("click", () => {
       break;
     case "insertion-sort":
       insertionSort();
+      break;
+    case "merge-sort":
+      mergeSort();
       break;
     default:
       console.log("Invalid algorithm");
