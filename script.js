@@ -61,7 +61,7 @@ async function bubbleSort() {
       bars[j + 1].style.backgroundColor = "var(--bar-comparing)";
 
       while (isPaused) {
-        await sleep(1000);
+        await sleep(100);
       }
 
       if (array[j] > array[j + 1]) {
@@ -93,7 +93,7 @@ async function selectionSort() {
       bars[minIndex].style.backgroundColor = "var(--bar-comparing)";
 
       while (isPaused) {
-        await sleep(1000);
+        await sleep(100);
       }
 
       if (array[j] < array[minIndex]) {
@@ -112,6 +112,55 @@ async function selectionSort() {
 
     bars[i].style.backgroundColor = "var(--sorted-bar-color)";
   }
+  generateArrayBtn.disabled = false;
+  startVisualizationBtn.disabled = false;
+  pauseResumeVisualizationBtn.disabled = true;
+}
+
+async function insertionSort() {
+  pauseResumeVisualizationBtn.disabled = false;
+  generateArrayBtn.disabled = true;
+  startVisualizationBtn.disabled = true;
+  const bars = arrayContainer.children;
+
+  for (let i = 1; i < array.length; i++) {
+    let key = array[i];
+    let j = i - 1;
+    bars[i].style.backgroundColor = "var(--highlight-bar-color)";
+
+    await sleep(visualizationSpeed);
+
+    while (j >= 0 && array[j] > key) {
+      bars[j].style.backgroundColor = "var(--bar-comparing)";
+      bars[j + 1].style.backgroundColor = "var(--bar-comparing)";
+
+      while (isPaused) {
+        await sleep(100);
+      }
+
+      array[j + 1] = array[j];
+      bars[j + 1].style.height = `${(array[j + 1] / maxArrayValue) * 100}%`;
+      bars[j + 1].innerText = array[j + 1];
+
+      await sleep(visualizationSpeed);
+
+      bars[j].style.backgroundColor = "var(--default-bar-color)";
+      j = j - 1;
+    }
+    array[j + 1] = key;
+    bars[j + 1].style.height = `${(key / maxArrayValue) * 100}%`;
+    bars[j + 1].innerText = key;
+
+    bars[i].style.backgroundColor = "var(--default-bar-color)";
+    bars[j + 1].style.backgroundColor = "var(--sorted-bar-color)";
+
+    await sleep(visualizationSpeed);
+  }
+
+  for (let i = 0; i < array.length; i++) {
+    bars[i].style.backgroundColor = "var(--sorted-bar-color)";
+  }
+
   generateArrayBtn.disabled = false;
   startVisualizationBtn.disabled = false;
   pauseResumeVisualizationBtn.disabled = true;
