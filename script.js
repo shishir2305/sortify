@@ -34,7 +34,7 @@ function renderArray() {
 function generateRandomArray() {
   array = [];
   for (let i = 0; i < arraySize; i++) {
-    array.push(Math.floor(Math.random() * 100) + 1);
+    array.push(Math.floor(Math.random() * 100) + 3);
   }
   renderArray();
 }
@@ -46,8 +46,11 @@ async function swap(bars, i, j) {
   array[j] = temp;
   bars[i].style.height = `${(array[i] / maxArrayValue) * 100}%`;
   bars[i].innerText = array[i];
+  bars[i].style.backgroundColor = "var(--swapped-bar-color)";
   bars[j].style.height = `${(array[j] / maxArrayValue) * 100}%`;
   bars[j].innerText = array[j];
+  bars[j].style.backgroundColor = "var(--swapped-bar-color)";
+  await sleep(visualizationSpeed);
 }
 
 async function bubbleSort() {
@@ -101,6 +104,8 @@ async function selectionSort() {
           bars[minIndex].style.backgroundColor = "var(--default-bar-color)";
         }
         minIndex = j;
+        bars[minIndex].style.backgroundColor = "var(--highlight-bar-color)";
+        await sleep(visualizationSpeed);
       } else {
         bars[j].style.backgroundColor = "var(--default-bar-color)";
       }
@@ -111,6 +116,7 @@ async function selectionSort() {
     }
 
     bars[i].style.backgroundColor = "var(--sorted-bar-color)";
+    await sleep(visualizationSpeed);
   }
   generateArrayBtn.disabled = false;
   startVisualizationBtn.disabled = false;
@@ -142,10 +148,9 @@ async function insertionSort() {
       bars[j + 1].style.height = `${(array[j + 1] / maxArrayValue) * 100}%`;
       bars[j + 1].innerText = array[j + 1];
 
-      await sleep(visualizationSpeed);
-
       bars[j].style.backgroundColor = "var(--default-bar-color)";
       j = j - 1;
+      await sleep(visualizationSpeed);
     }
     array[j + 1] = key;
     bars[j + 1].style.height = `${(key / maxArrayValue) * 100}%`;
@@ -186,6 +191,10 @@ async function merge(bars, start, mid, end) {
     bars[start + i].style.backgroundColor = "var(--bar-comparing)";
     bars[mid + 1 + j].style.backgroundColor = "var(--bar-comparing)";
     await sleep(visualizationSpeed);
+
+    while (isPaused) {
+      await sleep(100);
+    }
 
     if (leftArray[i] <= rightArray[j]) {
       array[k] = leftArray[i];
