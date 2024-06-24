@@ -252,6 +252,56 @@ async function mergeSort() {
   pauseResumeVisualizationBtn.disabled = true;
 }
 
+async function partition(bars, low, high) {
+  let pivot = array[high];
+  let i = low - 1;
+  for (let j = low; j < high; j++) {
+    bars[j].style.backgroundColor = "var(--bar-comparing)";
+    bars[high].style.backgroundColor = "var(--pivot-bar-color)";
+
+    while (isPaused) {
+      await sleep(100);
+    }
+
+    if (array[j] < pivot) {
+      i++;
+      await swap(bars, i, j);
+    }
+    bars[j].style.backgroundColor = "var(--default-bar-color)";
+  }
+
+  await swap(bars, i + 1, high);
+
+  for (let j = low; j <= high; j++) {
+    if (j !== i + 1) {
+      bars[j].style.backgroundColor = "var(--sorted-bar-color)";
+    }
+  }
+
+  bars[i + 1].style.backgroundColor = "var(--sorted-bar-color)";
+  await sleep(visualizationSpeed);
+  return i + 1;
+}
+
+async function quickSortHelper(bars, low, high) {
+  if (low < high) {
+    let partitionIndex = await partition(bars, low, high);
+    await quickSortHelper(bars, low, partitionIndex - 1);
+    await quickSortHelper(bars, partitionIndex + 1, high);
+  }
+}
+
+async function quickSort() {
+  pauseResumeVisualizationBtn.disabled = false;
+  generateArrayBtn.disabled = true;
+  startVisualizationBtn.disabled = true;
+  const bars = arrayContainer.children;
+  await quickSortHelper(bars, 0, array.length - 1);
+  generateArrayBtn.disabled = false;
+  startVisualizationBtn.disabled = false;
+  pauseResumeVisualizationBtn.disabled = true;
+}
+
 arraySizeSlider.addEventListener("input", (e) => {
   arraySize = e.target.value;
 });
@@ -288,6 +338,9 @@ startVisualizationBtn.addEventListener("click", () => {
       break;
     case "merge-sort":
       mergeSort();
+      break;
+    case "quick-sort":
+      quickSort();
       break;
     default:
       console.log("Invalid algorithm");
